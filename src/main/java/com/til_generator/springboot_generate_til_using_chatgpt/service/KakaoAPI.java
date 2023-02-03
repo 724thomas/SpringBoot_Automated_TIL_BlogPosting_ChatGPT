@@ -18,7 +18,7 @@ public class KakaoAPI {
     @Value("${tistory.access_key}")
     private String tistoryAccessKey;
 
-    public void writeOnBlog2(TistoryRequest tistoryRequest) throws IOException {
+    public void writeOnBlog(TistoryRequest tistoryRequest) throws IOException {
         URL url = new URL("https://www.tistory.com/apis/post/write");
         URLConnection con = url.openConnection();
         HttpURLConnection http = (HttpURLConnection)con;

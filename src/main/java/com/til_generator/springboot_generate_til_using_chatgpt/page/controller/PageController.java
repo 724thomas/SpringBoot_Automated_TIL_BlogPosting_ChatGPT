@@ -31,6 +31,8 @@ public class PageController {
 
     private String chatWithGpt3(String message) throws Exception {
         ChatGptRequest completion = ChatGptRequest.defaultWith(message);
+        System.out.println(completion);
+
         String postBodyJson = jsonMapper.writeValueAsString(completion);
         String responseBody = client.postToOpenAiApi(postBodyJson, ChatGptService.OpenAiService.GPT_3);
         ChatGptResponse completionResponse = jsonMapper.readValue(responseBody, ChatGptResponse.class);
@@ -48,9 +50,10 @@ public class PageController {
             tempRequest = dto.prompt();
             tempResponse = chatWithGpt3(tempRequest);
             model.addAttribute("request", tempRequest);
-            model.addAttribute("response", tempResponse);
+            model.addAttribute("response", tempResponse + "\n" + "Testing");
             System.out.println(tempRequest);
             System.out.println(tempResponse);
+            System.out.println(tempResponse + "\n" + "Testing");
 
 //            tempRequest = tempRequest.replace("\n","").trim();
 //            tempResponse = tempResponse.replace("\n","").trim();
@@ -69,10 +72,5 @@ public class PageController {
         return "index";
     }
 
-    @GetMapping("/postOnBlog2")
-    public String postOnBlog2() throws Exception {
-        TistoryRequest tistoryRequest = new TistoryRequest(tempRequest, tempResponse);
-        kakaoAPI.writeOnBlog2(tistoryRequest);
-        return "index";
-    }
+
 }
