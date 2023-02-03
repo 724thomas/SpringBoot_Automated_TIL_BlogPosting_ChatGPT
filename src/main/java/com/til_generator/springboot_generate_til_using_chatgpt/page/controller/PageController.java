@@ -52,8 +52,8 @@ public class PageController {
             System.out.println(tempRequest);
             System.out.println(tempResponse);
 
-            tempRequest = tempRequest.replace("\n","").replace(" ", "%20").trim();
-            tempResponse = tempResponse.replace("\n","").replace(" ", "%20").trim();
+//            tempRequest = tempRequest.replace("\n","").trim();
+//            tempResponse = tempResponse.replace("\n","").trim();
 
         } catch (Exception e) {
             model.addAttribute("response", "Error in communication with OpenAI ChatGPT API.");
@@ -66,6 +66,13 @@ public class PageController {
     public String postOnBlog() throws Exception {
         TistoryRequest tistoryRequest = new TistoryRequest(tempRequest, tempResponse);
         kakaoAPI.writeOnBlog(tistoryRequest);
+        return "index";
+    }
+
+    @GetMapping("/postOnBlog2")
+    public String postOnBlog2() throws Exception {
+        TistoryRequest tistoryRequest = new TistoryRequest(tempRequest, tempResponse);
+        kakaoAPI.writeOnBlog2(tistoryRequest);
         return "index";
     }
 }

@@ -4,12 +4,13 @@ import com.til_generator.springboot_generate_til_using_chatgpt.dto.TistoryReques
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.io.*;
+import java.net.*;
+import java.net.http.HttpClient;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringJoiner;
 
 @Service
 public class KakaoAPI {
@@ -17,63 +18,38 @@ public class KakaoAPI {
     @Value("${tistory.access_key}")
     private String tistoryAccessKey;
 
-    public void writeOnBlog2(TistoryRequest tistoryRequest) throws Exception {
-        URL url = new URL("https://www.tistory.com/apis/post/write?");
-        String postDatta = "access_token=" + tistoryAccessKey;
-        postDatta += "&output=json";
-        postDatta += "&blogName=thomaschoi";
-        postDatta += "&title=" + URLEncoder.encode(tistoryRequest.getTitle(), "UTF-8");
-        postDatta += "&content=" + URLEncoder.encode(tistoryRequest.getContent(), "UTF-8");
-        postDatta += "&category=1024642";
-        postDatta += "&visibility=3";
+    public void writeOnBlog2(TistoryRequest tistoryRequest) throws IOException {
+        URL url = new URL("https://www.tistory.com/apis/post/write");
+        URLConnection con = url.openConnection();
+        HttpURLConnection http = (HttpURLConnection)con;
+        http.setRequestMethod("POST"); // PUT is another valid option
+        http.setDoOutput(true);
 
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setDoOutput(true);
-        conn.setDoInput(true);
-        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        conn.setRequestProperty("Content-Length", String.valueOf(postDatta.length()));
-        System.out.println("Response Message: " + conn);
-        System.out.println("response code = " + conn.getResponseCode());
-        try (DataOutputStream dos = new DataOutputStream(conn.getOutputStream())){
-            dos.writeBytes(postDatta);
-        }
-        try (BufferedReader bf = new BufferedReader(new InputStreamReader(conn.getInputStream()))){
-            String line;
-            StringBuilder response = new StringBuilder();
-            while ((line = bf.readLine()) != null) {
-                response.append(line);
-            }
-            bf.close();
-            System.out.println(response.toString());
+        Map<String,String> arguments = new HashMap<>();
+        arguments.put("access_token", tistoryAccessKey);
+        arguments.put("output", "json");
+        arguments.put("blogName", "thomaschoi");
+        arguments.put("title", tistoryRequest.getTitle());
+        arguments.put("content", tistoryRequest.getContent());
+        arguments.put("category", "1024642");
+        arguments.put("visibility", "3");
+        System.out.println("----------------------------------------------------------");
+        System.out.println(arguments);
+        System.out.println("----------------------------------------------------------");
+
+        StringJoiner sj = new StringJoiner("&");
+        for(Map.Entry<String,String> entry : arguments.entrySet())
+            sj.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "="
+                    + URLEncoder.encode(entry.getValue(), "UTF-8"));
+        byte[] out = sj.toString().getBytes(StandardCharsets.UTF_8);
+        int length = out.length;
+
+        http.setFixedLengthStreamingMode(length);
+        http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        http.connect();
+        try(OutputStream os = http.getOutputStream()) {
+            os.write(out);
         }
     }
 
-
-    public String writeOnBlog(TistoryRequest tistoryRequest) {
-
-        String reqURL = "https://www.tistory.com/apis/post/write?";
-        reqURL += "access_token=" + tistoryAccessKey;
-        reqURL += "&output=json";
-        reqURL += "&blogName=thomaschoi";
-        reqURL += "&title=" + "'" + tistoryRequest.getTitle() + "'";
-        reqURL += "&content=" + "'" + tistoryRequest.getContent() + "'";
-        reqURL += "&category=1024642";
-        reqURL += "&visibility=20";
-
-        try {
-            URL url = new URL(reqURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-
-            int responseCode = conn.getResponseCode();
-            System.out.println("Response Message: " + conn);
-            System.out.println("response code = " + responseCode);
-
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        return reqURL;
-    }
 }
