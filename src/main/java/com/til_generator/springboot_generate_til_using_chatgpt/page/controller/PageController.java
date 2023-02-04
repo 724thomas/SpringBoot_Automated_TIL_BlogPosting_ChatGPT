@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.io.IOException;
+
 @Controller
 public class PageController {
 
@@ -50,13 +52,13 @@ public class PageController {
             tempRequest = dto.prompt();
             tempResponse = chatWithGpt3(tempRequest);
             model.addAttribute("request", tempRequest);
-            model.addAttribute("response", tempResponse + "\n" + "Testing");
-            System.out.println(tempRequest);
-            System.out.println(tempResponse);
-            System.out.println(tempResponse + "\n" + "Testing");
+            model.addAttribute("response", tempResponse);
 
-//            tempRequest = tempRequest.replace("\n","").trim();
-//            tempResponse = tempResponse.replace("\n","").trim();
+            System.out.println("tempRequest: ");
+            System.out.println(tempRequest);
+            System.out.println("tempResponse: ");
+            System.out.println(tempResponse);
+
 
         } catch (Exception e) {
             model.addAttribute("response", "Error in communication with OpenAI ChatGPT API.");
@@ -72,5 +74,14 @@ public class PageController {
         return "index";
     }
 
+    @PostMapping("/printContents")
+    public String printContent(TistoryRequest tistoryRequest) throws IOException {
+        String content = tistoryRequest.getContent();
+        content = content.replace(System.getProperty("line.separator"),"<br/>");
+        tistoryRequest.setContent(content);
 
+//        kakaoAPI.writeOnBlog(tistoryRequest);
+        System.out.println("--------------------------------------------------------");
+        return "redirect:/";
+    }
 }
