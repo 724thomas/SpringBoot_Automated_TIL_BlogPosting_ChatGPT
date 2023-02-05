@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>연체중인 책 목록</h1>
+    <table border="1">
+        <tr>
+            <th>번호</th>
+            <th>제목</th>
+            <th>글쓴이</th>
+            <th>날짜</th>
+            <th>조회수</th>
+          </tr>
+          <tr th:each="book : ${overdueBookList}">
+            <td th:text="${book.bookId}"></td>
+            <td th:text="${book.bookTitle}"></td>
+            <td th:text="${book.bookAuthor}"></td>
+            <td th:text="${book.borrowedDate}"></td>
+            <td th:text="${book.dueDate}"></td>
+        </tr>
+      <br>
+    </table>
+</body>
+</html>

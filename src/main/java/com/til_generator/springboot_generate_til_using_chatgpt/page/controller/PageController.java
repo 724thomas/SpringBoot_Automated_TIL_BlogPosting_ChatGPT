@@ -59,11 +59,20 @@ public class PageController {
             System.out.println("tempResponse: ");
             System.out.println(tempResponse);
 
-
         } catch (Exception e) {
             model.addAttribute("response", "Error in communication with OpenAI ChatGPT API.");
         }
         return "index";
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+    @GetMapping("/signup")
+    public String signup() {
+        return "signup";
     }
 
 
